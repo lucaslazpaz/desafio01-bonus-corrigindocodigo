@@ -23,7 +23,6 @@ function verifyIfExistsReporitory(request, response, next) {
   request.repository = repository;
 
   return next();
-
 }
 
 app.get("/repositories", (request, response) => {
@@ -60,15 +59,20 @@ app.put("/repositories/:id", verifyIfExistsReporitory, (request, response) => {
 app.delete("/repositories/:id", verifyIfExistsReporitory, (request, response) => {
   const { repository } = request;
 
-  repositories.splice(repository, 1);
+  repositoryIndex = repositories.findIndex((repo) => repo.id === repository.id);
+
+  if (repositoryIndex < 0) {
+    return response.status(404).json({ error: "Repository not found" });
+  }
+
+  repositories.splice(repositoryIndex, 1);
 
   return response.status(204).send();
 });
 
 app.post("/repositories/:id/like", verifyIfExistsReporitory, (request, response) => {
   const { repository } = request;
-  const likes = ++repository.likes;
-  repository.likes = likes;
+  repository.likes = ++repository.likes;
 
   return response.json(repository);
 });
